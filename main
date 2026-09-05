@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สำนวนไทยออราเคิล - Thai Idiom Oracle Deck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;600&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+        .font-mitr { font-family: 'Mitr', sans-serif; }
+
+        /* CSS สำหรับ Card Flip Animation 3D */
+        .perspective { perspective: 1000px; }
+        .card-inner {
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .card-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Gold Glow Effect */
+        .gold-border {
+            border: 2px solid #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-amber-50 min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- Header -->
+    <header class="text-center my-6">
+        <h1 class="font-mitr text-3xl sm:text-4xl text-amber-400 font-bold mb-2 tracking-wide">
+            🔮 ไพ่ออราเคิลสำนวนไทย
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base max-w-md">
+            ทำจิตใจให้สงบ นึกถึงข้อสงสัยหรือคำถามในใจ แล้วกดเปิดไพ่เพื่อรับคำเตือนสติ
+        </p>
+    </header>
+
+    <!-- Card Arena -->
+    <main class="flex-1 flex flex-col items-center justify-center w-full max-w-md my-4">
+        <div class="perspective w-72 h-[420px] sm:w-80 sm:h-[460px] cursor-pointer" onclick="drawCard()">
+            <div id="oracleCard" class="card-inner relative w-full h-full rounded-2xl shadow-2xl">
+                
+                <!-- หลังไพ่ (Card Front/Back Cover) -->
+                <div class="card-front absolute inset-0 bg-slate-900 rounded-2xl gold-border p-6 flex flex-col items-center justify-between overflow-hidden">
+                    <div class="w-full border-b border-amber-500/30 text-center pb-2">
+                        <span class="text-xs text-amber-400/70 tracking-widest uppercase font-mitr">Thai Oracle</span>
+                    </div>
+                    
+                    <div class="flex flex-col items-center gap-4 my-auto">
+                        <div class="w-24 h-24 rounded-full border border-amber-400/40 flex items-center justify-center bg-amber-500/5">
+                            <span class="text-5xl">☸️</span>
+                        </div>
+                        <p class="text-amber-300 font-mitr text-sm animate-pulse">แตะที่ไพ่เพื่อทำนาย</p>
+                    </div>
+
+                    <div class="w-full border-t border-amber-500/30 text-center pt-2">
+                        <span class="text-xs text-slate-500">78 CARD DECK</span>
+                    </div>
+                </div>
+
+                <!-- หน้าไพ่ (Card Result) -->
+                <div class="card-back absolute inset-0 bg-slate-900 rounded-2xl gold-border p-6 flex flex-col justify-between bg-gradient-to-b from-slate-900 via-slate-900 to-amber-950/40">
+                    <div>
+                        <!-- Category Badge -->
+                        <div class="flex justify-between items-center mb-3">
+                            <span id="cardCategory" class="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/30 font-mitr">
+                                หมวดหมู่
+                            </span>
+                            <span id="cardNo" class="text-xs text-slate-500 font-mono">#00</span>
+                        </div>
+
+                        <!-- Idiom Title -->
+                        <h2 id="cardTitle" class="font-mitr text-2xl text-amber-300 font-bold text-center my-3 border-b border-amber-500/20 pb-2">
+                            สำนวนไทย
+                        </h2>
+
+                        <!-- Meaning -->
+                        <p id="cardMeaning" class="text-slate-300 text-xs sm:text-sm text-center italic mb-4 leading-relaxed">
+                            ความหมายของสำนวน
+                        </p>
+                    </div>
+
+                    <!-- Warning Box (คำเตือนบนหน้าไพ่) -->
+                    <div class="bg-amber-950/60 border border-amber-500/40 rounded-xl p-4 my-auto shadow-inner">
+                        <div class="flex items-center gap-2 text-amber-400 text-xs font-mitr mb-1">
+                            <span>⚠️</span>
+                            <span>คำเตือนบนหน้าไพ่ (Oracle Guidance)</span>
+                        </div>
+                        <p id="cardWarning" class="text-amber-100 text-sm leading-relaxed font-mitr">
+                            คำเตือนและคำแนะนำเชิงดวงชะตา...
+                        </p>
+                    </div>
+
+                    <div class="text-center pt-2">
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Thai Wisdom Oracle</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Controls -->
+    <footer class="w-full max-w-md flex flex-col items-center gap-3 mb-4">
+        <button onclick="drawCard()" id="drawBtn" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-mitr font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-amber-900/30 active:scale-95 transition-all text-base flex items-center justify-center gap-2">
+            <span>🎲</span>
+            <span>สุ่มเปิดไพ่ออราเคิล</span>
+        </button>
+    </footer>
+
+    <!-- Database & Script -->
+    <script>
+        // ฐานข้อมูลไพ่ออราเคิลสำนวนไทย
+        const oracleDeck = [
+            {
+                id: 1,
+                idiom: "ขี่ช้างจับตั๊กแตน",
+                category: "การลงทุน & การงาน",
+                meaning: "ลงทุนหรือลงแรงไปอย่างมากมาย เพื่อทำงานเล็กๆ ที่ได้ผลตอบแทนเพียงนิดเดียว",
+                warning: "อย่าใช้ทรัพยากรหรืออารมณ์เกินตัวกับเรื่องไม่เป็นเรื่อง ระวังเสียเวลาและเงินทองโดยไม่คุ้มกับผลลัพธ์ที่ได้รับ"
+            },
+            {
+                id: 2,
+                idiom: "น้ำขึ้นให้รีบตัก",
+                category: "โอกาส & จังหวะชีวิต",
+                meaning: "เมื่อมีโอกาสดีเข้ามาถึง ควรรีบขวักไขว่และทำทันที",
+                warning: "จังหวะชีวิตกำลังเปิดให้อย่างมาก หากมัวแต่ลังเลหรือขี้เกียจ โอกาสทองนี้จะหลุดลอยไปและยากจะวนกลับมา"
+            },
+            {
+                id: 3,
+                idiom: "ดินพอกหางหมู",
+                category: "การจัดการ & ภาระงาน",
+                meaning: "การงานหรือปัญหาที่สืบค้างค้างไว้ ยิ่งปล่อยไว้นานก็ยิ่งสะสมจนจัดการได้ยาก",
+                warning: "อย่าผลัดวันประกันพรุ่ง! สิ่งที่คุณเลี่ยงไม่ยอมทำในวันนี้ กำลังสะสมเป็นปัญหาใหญ่ที่จะกลับมาสร้างความเครียดให้คุณในไม่ช้า"
+            },
+            {
+                id: 4,
+                idiom: "น้ำนิ่งไหลลึก",
+                category: "ความสัมพันธ์ & คนรอบตัว",
+                meaning: "คนที่ดูสงบเงียบ แต่อาจมีความคิดหรือความสามารถซ่อนอยู่ภายในมากมาย",
+                warning: "อย่ามองคนหรือสถานการณ์แค่ภายนอก สิ่งที่ดูเรียบง่ายอาจมีเบื้องลึกเบื้องหลังที่ซับซ้อน ระวังการประเมินคู่แข่งต่ำไป"
+            },
+            {
+                id: 5,
+                idiom: "ฝนทั่งให้เป็นเข็ม",
+                category: "ความเพียร & อนาคต",
+                meaning: "มีความเพียรพยายามทำความดีหรือทำงานที่ยากลำบากอย่างไม่ท้อถอยจนสำเร็จ",
+                warning: "ผลลัพธ์ใหญ่ต้องใช้เวลา อย่าเพิ่งท้อกลางทาง แม้ตอนนี้จะยังไม่เห็นความก้าวหน้า แต่ความอดทนจะส่งผลสำเร็จในที่สุด"
+            },
+            {
+                id: 6,
+                idiom: "ชี้โพรงให้กระรอก",
+                category: "คำพูด & การสื่อสาร",
+                meaning: "การบอกหรือแนะแนวทางให้ผู้อื่นทำในสิ่งที่เขาอยากทำอยู่แล้ว (มักใช้ในทางไม่ดี)",
+                warning: "ระวังคำพูดและการระบายข้อมูลของคุณ อาจมีคนนำความคิดหรือจุดอ่อนของคุณไปใช้หาประโยชน์เข้าตัวเองโดยที่คุณไม่รู้ตัว"
+            },
+            {
+                id: 7,
+                idiom: "กบในกะลาแถว",
+                category: "มุมมอง & การเรียนรู้",
+                meaning: "คนที่รอบรู้อยู่ในวงแคบๆ แต่คิดว่าตนเองรู้มากแล้ว",
+                warning: "เปิดใจฟังมุมมองใหม่ๆ ได้แล้ว การยึดติดกับความคิดเดิมๆ จะทำให้คุณพลาดโอกาสเติบโตและถูกคนอื่นแซงหน้า"
+            },
+            {
+                id: 8,
+                idiom: "ขวานผ่าซาก",
+                category: "คำพูด & การวางตัว",
+                meaning: "การพูดจาตรงๆ โผงผาง โดยไม่เกรงใจใครและไม่คำนึงถึงความรู้สึกของผู้ฟัง",
+                warning: "ความหวังดีแต่ขาดศิลปะในการสื่อสารจะสร้างศัตรูโดยไม่รู้ตัว ปรับโทนคำพูดให้ซอฟต์ลงนิด แล้วความสัมพันธ์จะดีขึ้น"
+            },
+            {
+                id: 9,
+                idiom: "วัวหายล้อมคอก",
+                category: "การป้องกัน & สติ",
+                meaning: "เกิดเรื่องเสียหายขึ้นแล้วจึงคิดหาทางป้องกันหรือแก้ไข",
+                warning: "ตรวจเช็กความรอบคอบในงานและชีวิตทันที อย่ารอให้ความผิดพลาดเกิดขึ้นก่อนแล้วค่อยมาตามแก้ภายหลัง"
+            },
+            {
+                id: 10,
+                idiom: "จับปลาสองมือ",
+                category: "การตัดสินใจ & โฟกัส",
+                meaning: "พยายามทำสองอย่างพร้อมๆ กัน ซึ่งอาจทำให้ไม่ได้ผลดีสักอย่าง",
+                warning: "คุณกำลังพยายามทำหลายอย่างมากเกินไปในเวลาเดียวกัน ให้เลือกเป้าหมายสำคัญที่สุดเพียงอย่างเดียวแล้วโฟกัสให้จบก่อน"
+            }
+        ];
+
+        let isFlipped = false;
+        let isAnimating = false;
+
+        function drawCard() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const card = document.getElementById('oracleCard');
+            const drawBtn = document.getElementById('drawBtn');
+
+            // ถ้าไพ่เปิดอยู่ ให้พลิกกลับก่อน แล้วค่อยสุ่ม
+            if (isFlipped) {
+                card.classList.remove('is-flipped');
+                isFlipped = false;
+                
+                setTimeout(() => {
+                    pickRandomData();
+                    card.classList.add('is-flipped');
+                    isFlipped = true;
+                    isAnimating = false;
+                }, 800);
+            } else {
+                pickRandomData();
+                card.classList.add('is-flipped');
+                isFlipped = true;
+                setTimeout(() => { isAnimating = false; }, 800);
+            }
+        }
+
+        function pickRandomData() {
+            const randomIndex = Math.floor(Math.random() * oracleDeck.length);
+            const data = oracleDeck[randomIndex];
+
+            document.getElementById('cardNo').innerText = `#${String(data.id).padStart(2, '0')}`;
+            document.getElementById('cardCategory').innerText = data.category;
+            document.getElementById('cardTitle').innerText = data.idiom;
+            document.getElementById('cardMeaning').innerText = `"${data.meaning}"`;
+            document.getElementById('cardWarning').innerText = data.warning;
+        }
+    </script>
+</body>
+</html>
